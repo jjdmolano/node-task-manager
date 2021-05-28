@@ -24,11 +24,10 @@ MongoClient.connect(
 
 		// CRUD - Create, Read, Update, Delete
 
-        // Create
+		// Create
 		// db.collection('users').insertOne(
 		// 	{
-        //         _id: id,
-		// 		name: 'Vikran',
+		// 		name: 'Andrew',
 		// 		age: 26
 		// 	},
 		// 	(error, result) => {
@@ -83,5 +82,86 @@ MongoClient.connect(
 		// 		console.log(result.ops);
 		// 	}
 		// );
+
+		// Read
+		// findOne
+		// db.collection('users').findOne({ _id: new ObjectID("60af50cc4d013d3c58acd525") }, (error, user) => {
+		//     if (error) {
+		//         return console.log('Unable to fetch');
+		//     }
+
+		//     console.log(user);
+		// })
+
+		// find multiple
+		// db.collection('users').find({ age: 26 }).toArray((error, users) => {
+		//     if (error) {
+		//         return console.log('Unable to fetch');
+		//     }
+		//     console.log(users);
+		// });
+
+		// Update
+		// db.collection('users')
+		// 	.updateOne(
+		// 		{
+		// 			_id: new ObjectID('60af50cc4d013d3c58acd525')
+		// 		},
+		// 		{
+		// 			// $set: {
+		// 			// 	name: 'Michael'
+		// 			// }
+		//             $inc: {
+		//                 age: 1
+		//             }
+		// 		}
+		// 	)
+		// 	.then(result => {
+		// 		console.log(result);
+		// 	})
+		// 	.catch(error => {
+		// 		console.log(error);
+		// 	});
+
+		// 	db.collection('tasks')
+		// 		.updateMany(
+		// 			{
+		// 				completed: false
+		// 			},
+		// 			{
+		// 				$set: {
+		// 					completed: true
+		// 				}
+		// 			}
+		// 		)
+		// 		.then(result => {
+		// 			console.log(result);
+		// 		})
+		// 		.catch(error => {
+		// 			console.log(error);
+		// 		});
+
+		// Delete
+		// db.collection('users')
+		// 	.deleteMany({
+		// 		age: 26
+		// 	})
+		// 	.then(result => {
+		// 		console.log(result);
+		// 	})
+		// 	.catch(error => {
+		// 		console.log(error);
+		// 	});
+
+		// db.collection('tasks')
+		// 	.deleteOne({
+		// 		description: 'Fix bed'
+		// 	})
+		// 	.then(result => {
+		// 		console.log(result);
+		// 	})
+		// 	.catch(error => {
+		// 		console.log(error);
+		// 	});
 	}
 );
