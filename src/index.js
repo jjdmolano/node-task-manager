@@ -8,6 +8,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 
 // Create endpoints
+// Users
 app.post('/users', async (req, res) => {
 	const user = new User(req.body);
 
@@ -19,6 +20,7 @@ app.post('/users', async (req, res) => {
 	}
 });
 
+// Tasks
 app.post('/tasks', async (req, res) => {
 	const task = new Task(req.body);
 
@@ -31,6 +33,7 @@ app.post('/tasks', async (req, res) => {
 });
 
 // Read endpoints
+// Users
 app.get('/users', async (req, res) => {
 	try {
 		const users = await User.find({});
@@ -51,6 +54,7 @@ app.get('/users/:id', async (req, res) => {
 	}
 });
 
+// Tasks
 app.get('/tasks', async (req, res) => {
 	try {
 		const tasks = await Task.find({});
@@ -72,6 +76,7 @@ app.get('/tasks/:id', async (req, res) => {
 });
 
 // Update endpoints
+// Users
 app.patch('/users/:id', async (req, res) => {
 	const updates = Object.keys(req.body);
 	const allowedUpdate = ['name', 'email', 'password', 'age'];
@@ -93,6 +98,7 @@ app.patch('/users/:id', async (req, res) => {
 	}
 });
 
+// Tasks
 app.patch('/tasks/:id', async (req, res) => {
 	const updates = Object.keys(req.body);
 	const allowedUpdate = ['description', 'completed'];
@@ -112,6 +118,27 @@ app.patch('/tasks/:id', async (req, res) => {
 		!task ? res.status(404).send() : res.send(task);
 	} catch (e) {
 		res.status(400).send(e);
+	}
+});
+
+// Delete endpoints
+// Users
+app.delete('/users/:id', async (req, res) => {
+	try {
+		const user = await User.findByIdAndDelete(req.params.id);
+		!user ? res.status(404).send() : res.send(user);
+	} catch (e) {
+		res.status(500).send();
+	}
+});
+
+// Tasks
+app.delete('/tasks/:id', async (req, res) => {
+	try {
+		const task = await Task.findByIdAndDelete(req.params.id);
+		!task ? res.status(404).send() : res.send(task);
+	} catch (e) {
+		res.status(500).send();
 	}
 });
 
