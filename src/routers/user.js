@@ -30,7 +30,31 @@ router.post('/users/login', async (req, res) => {
 	}
 });
 
-// Read
+// Logout
+router.post('/users/logout', auth, async (req, res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter(token => {
+            return token.token !== req.token
+        })
+        await req.user.save()
+        res.send()
+    } catch (e) {
+        res.status(500).send()
+    }
+});
+
+// Logout and remove all tokens
+router.post('/users/logoutAll', auth, async (req, res) => {
+    try {
+        req.user.tokens = []
+        await req.user.save()
+        res.send()
+    } catch (e) {
+        res.status(500).send()
+    }
+});
+
+// Read all profiles
 // router.get('/users', auth, async (req, res) => {
 // 	try {
 // 		const users = await User.find({});
@@ -40,10 +64,12 @@ router.post('/users/login', async (req, res) => {
 // 	}
 // });
 
+// Read own user profile
 router.get('/users/me', auth, async (req, res) => {
-	res.send(req.user)
+	res.send(req.user);
 });
 
+// Read targeted user
 router.get('/users/:id', async (req, res) => {
 	const _id = req.params.id;
 
@@ -55,7 +81,7 @@ router.get('/users/:id', async (req, res) => {
 	}
 });
 
-// Update
+// Update user
 router.patch('/users/:id', async (req, res) => {
 	const updates = Object.keys(req.body);
 	const allowedUpdate = ['name', 'email', 'password', 'age'];
@@ -77,7 +103,7 @@ router.patch('/users/:id', async (req, res) => {
 	}
 });
 
-// Delete
+// Delete user
 router.delete('/users/:id', async (req, res) => {
 	try {
 		const user = await User.findByIdAndDelete(req.params.id);
