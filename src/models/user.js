@@ -60,6 +60,23 @@ userSchema.methods.generateAuthToken = async function () {
 	return token;
 };
 
+// define relationship between models without storing this data in the database
+userSchema.virtual('tasks', {
+	ref: 'Task',
+    localField: '_id',
+    foreignField: 'owner'
+});
+
+// 'user' method to prevent returning user password and token data
+userSchema.methods.toJSON = function () {
+	const userObject = this.toObject();
+
+	delete userObject.password;
+	delete userObject.tokens;
+	return userObject;
+};
+
+// 'User' method to find user by credentials
 userSchema.statics.findByCredentials = async (email, password) => {
 	const user = await User.findOne({ email });
 	if (!user) {

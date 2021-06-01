@@ -32,26 +32,26 @@ router.post('/users/login', async (req, res) => {
 
 // Logout
 router.post('/users/logout', auth, async (req, res) => {
-    try {
-        req.user.tokens = req.user.tokens.filter(token => {
-            return token.token !== req.token
-        })
-        await req.user.save()
-        res.send()
-    } catch (e) {
-        res.status(500).send()
-    }
+	try {
+		req.user.tokens = req.user.tokens.filter(token => {
+			return token.token !== req.token;
+		});
+		await req.user.save();
+		res.send();
+	} catch (e) {
+		res.status(500).send();
+	}
 });
 
 // Logout and remove all tokens
 router.post('/users/logoutAll', auth, async (req, res) => {
-    try {
-        req.user.tokens = []
-        await req.user.save()
-        res.send()
-    } catch (e) {
-        res.status(500).send()
-    }
+	try {
+		req.user.tokens = [];
+		await req.user.save();
+		res.send();
+	} catch (e) {
+		res.status(500).send();
+	}
 });
 
 // Read all profiles
@@ -82,7 +82,7 @@ router.get('/users/:id', async (req, res) => {
 });
 
 // Update user
-router.patch('/users/:id', async (req, res) => {
+router.patch('/users/me', auth, async (req, res) => {
 	const updates = Object.keys(req.body);
 	const allowedUpdate = ['name', 'email', 'password', 'age'];
 	const isValidUpdate = updates.every(update =>
@@ -93,21 +93,19 @@ router.patch('/users/:id', async (req, res) => {
 		return res.status(400).send({ error: 'Invalid updates!' });
 	}
 	try {
-		const user = await User.findById(req.params.id);
-		updates.forEach(update => (user[update] = req.body[update]));
-		await user.save();
-
-		!user ? res.status(404).send() : res.send(user);
+		updates.forEach(update => (req.user[update] = req.body[update]));
+		await req.user.save();
+        res.send(req.user);
 	} catch (e) {
 		res.status(400).send(e);
 	}
 });
 
 // Delete user
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/me', auth, async (req, res) => {
 	try {
-		const user = await User.findByIdAndDelete(req.params.id);
-		!user ? res.status(404).send() : res.send(user);
+		await req.user.remove();
+		res.send(req.user);
 	} catch (e) {
 		res.status(500).send();
 	}
