@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Task = require('../models/task');
 
 const userSchema = new mongoose.Schema({
 	name: {
@@ -63,8 +64,8 @@ userSchema.methods.generateAuthToken = async function () {
 // define relationship between models without storing this data in the database
 userSchema.virtual('tasks', {
 	ref: 'Task',
-    localField: '_id',
-    foreignField: 'owner'
+	localField: '_id',
+	foreignField: 'owner'
 });
 
 // 'user' method to prevent returning user password and token data
@@ -97,6 +98,12 @@ userSchema.pre('save', async function (next) {
 		this.password = await bcrypt.hash(this.password, 8);
 	}
 
+	next();
+});
+
+// Middleware to delete user tasks when user is removed
+userSchema.pre('remove', async function (next) {
+	await Task.deleteMany({ owner: this._id });
 	next();
 });
 
