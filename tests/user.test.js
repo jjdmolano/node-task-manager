@@ -37,6 +37,35 @@ test('Should signup a new user', async () => {
 	expect(user.password).not.toBe('MyPass777!');
 });
 
+test('Should not signup user with invalid name/email/password', async () => {
+	await request(app)
+		.post('/users')
+		.send({
+			name: '',
+			email: 'none@example.com',
+			password: 'MyPass777!'
+		})
+		.expect(400);
+
+	await request(app)
+		.post('/users')
+		.send({
+			name: 'Andrew',
+			email: 'andrew@example',
+			password: 'MyPass777!'
+		})
+		.expect(400);
+
+	await request(app)
+		.post('/users')
+		.send({
+			name: 'Andrew',
+			email: 'andrew@example.com',
+			password: 'pass'
+		})
+		.expect(400);
+});
+
 test('Should login existing user', async () => {
 	const response = await request(app)
 		.post('/users/login')
@@ -69,6 +98,47 @@ test('Should get profile for user', async () => {
 
 test('Should not get profile for unauthenticated user', async () => {
 	await request(app).get('/users/me').send().expect(401);
+});
+
+test('Should not update user if unauthenticated', async () => {
+	await request(app)
+		.patch('/users/me')
+		.send({
+			name: 'Jess'
+		})
+		.expect(401);
+});
+
+test('Should not update user with invalid name/email/password', async () => {
+	await request(app)
+		.patch('/users/me')
+		.set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+		.send({
+            name: '',
+			email: 'none@example.com',
+			password: 'MyPass777!'
+		})
+		.expect(400);
+
+    await request(app)
+		.patch('/users/me')
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+		.send({
+			name: 'Andrew',
+			email: 'andrew@example',
+			password: 'MyPass777!'
+		})
+		.expect(400);
+
+	await request(app)
+        .patch('/users/me')
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+		.send({
+			name: 'Andrew',
+			email: 'andrew@example.com',
+			password: 'pass'
+		})
+		.expect(400);
 });
 
 test('Should update valid user fields', async () => {
