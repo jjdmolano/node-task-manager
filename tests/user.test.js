@@ -1,30 +1,16 @@
 const request = require('supertest');
 const app = require('../src/app');
-const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
 const User = require('../src/models/user');
+const {
+	userOneId,
+	userOne,
+	setupDatabase,
+	disconnectDatabase
+} = require('./fixtures/db');
 
-const userOneId = new mongoose.Types.ObjectId();
-const userOne = {
-	_id: userOneId,
-	name: 'Base User',
-	email: 'user@example.com',
-	password: '56what!!',
-	tokens: [
-		{
-			token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET)
-		}
-	]
-};
+beforeEach(setupDatabase);
 
-beforeEach(async () => {
-	await User.deleteMany();
-	await new User(userOne).save();
-});
-
-afterAll(async () => {
-	await mongoose.disconnect();
-});
+afterAll(disconnectDatabase);
 
 test('Should signup a new user', async () => {
 	const response = await request(app)
@@ -85,6 +71,28 @@ test('Should not get profile for unauthenticated user', async () => {
 	await request(app).get('/users/me').send().expect(401);
 });
 
+test('Should update valid user fields', async () => {
+	await request(app)
+		.patch('/users/me')
+		.set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+		.send({
+			name: 'Jess'
+		})
+		.expect(200);
+	const user = await User.findById(userOneId);
+	expect(user.name).toEqual('Jess');
+});
+
+test('Should not update invalid user fields', async () => {
+	await request(app)
+		.patch('/users/me')
+		.set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+		.send({
+			pet: 'Cat'
+		})
+		.expect(400);
+});
+
 test('Should delete user profile', async () => {
 	await request(app)
 		.delete('/users/me')
@@ -92,11 +100,21 @@ test('Should delete user profile', async () => {
 		.send()
 		.expect(200);
 
-    // Assert null response
-    const user = await User.findById(userOneId);
-    expect(user).toBeNull();
+	// Assert null response
+	const user = await User.findById(userOneId);
+	expect(user).toBeNull();
 });
 
 test('Should not delete unauthenticated user profile ', async () => {
 	await request(app).delete('/users/me').send().expect(401);
+});
+
+test('Should upload avatar image', async () => {
+	await request(app)
+		.post('/users/me/avatar')
+		.set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+		.attach('avatar', 'tests/fixtures/profile-pic.jpg')
+		.expect(200);
+	const user = await User.findById(userOneId);
+	expect(user.avatar).toEqual(expect.any(Buffer));
 });
