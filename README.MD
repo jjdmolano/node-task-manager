@@ -61,6 +61,9 @@ on another terminal to connect to the database.
 }
 ```
 
+* When testing the below endpoints, double check to make sure that you are using the authorization token that was returned by the API upon registration/login.
+
+
 * To logout the currently logged in user, use a **POST** request to the **/users/logout** endpoint (ex. http://localhost:3000/users/logout).
 
 * To read the logged in user's data, use a **GET** request to the **/users/me** endpoint (ex. http://localhost:3000/users/me). It will return the user's data in a JSON format.
@@ -88,6 +91,9 @@ on another terminal to connect to the database.
 
 
 ## CRUD for Tasks
+* When testing the below endpoints, double check to make sure that you are using the authorization token that was returned by the API upon registration/login.
+
+
 * To create a task, use a **POST** request to the **/tasks** endpoint (ex. http://localhost:3000/tasks) with the following JSON body data:
 ```json
 {
